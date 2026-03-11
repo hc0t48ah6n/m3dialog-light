@@ -1,0 +1,685 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google-site-verification" content="xSMe8NjOJitIbihp_Rs4ctuOhG8ogC3gYNH4PRTPxKA" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M3Dialog.js - Developer Documentation</title>
+    <link href="https://fonts.googleapis.com/css2?f -->amily=Roboto:wght@300;400;500;700&family=Google+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+   <meta name="modal" content="M3Dialog, GAS, モーダル, ダイアログ, Material 3, Google Apps Script, ライブラリ">
+    <style>
+        :root {
+            --primary: #0b57d0;
+            --primary-container: #d3e3fd;
+            --surface: #f8f9fa;
+            --on-surface: #1f1f1f;
+            --outline: #747775;
+            --code-bg: #1e1e1e;
+            --accent: #c2e7ff;
+        }
+
+        body {
+            font-family: 'Roboto', 'Google Sans', sans-serif;
+            margin: 0;
+            background-color: var(--surface);
+            color: var(--on-surface);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        /* Language Switcher using Select */
+        .lang-switch-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .lang-select {
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px solid #dadce0;
+            background-color: white;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            color: var(--on-surface);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .lang-select:focus {
+            border-color: var(--primary);
+        }
+
+        /* Multilingual Content Control */
+        body[lang="ja"] .en-only { display: none !important; }
+        body[lang="en"] .ja-only { display: none !important; }
+
+        /* Layout */
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        nav {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #dadce0;
+            padding: 40px 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        nav h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--outline);
+            margin-bottom: 16px;
+            letter-spacing: 0.8px;
+        }
+
+        nav a {
+            display: block;
+            padding: 10px 16px;
+            text-decoration: none;
+            color: var(--on-surface);
+            border-radius: 8px;
+            margin-bottom: 4px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        nav a:hover {
+            background: #f1f3f4;
+        }
+
+        main {
+            flex: 1;
+            padding: 60px 40px;
+            max-width: 900px;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            color: var(--primary);
+            font-family: 'Google Sans';
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--primary-container);
+            color: var(--primary);
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        section {
+            margin-bottom: 80px;
+        }
+
+        h2 {
+            font-family: 'Google Sans';
+            font-size: 2rem;
+            margin-bottom: 24px;
+            color: #444;
+        }
+
+        .card {
+            background: white;
+            padding: 32px;
+            border-radius: 28px;
+            border: 1px solid #dadce0;
+            margin-bottom: 24px;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: #dcdcdc;
+            padding: 24px;
+            border-radius: 16px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1.5;
+            font-size: 14px;
+            margin: 20px 0;
+        }
+
+        .highlight { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 100px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-family: 'Google Sans';
+            transition: box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            box-shadow: 0 4px 12px rgba(11, 87, 208, 0.25);
+        }
+
+        .tip {
+            border-left: 4px solid #4caf50;
+            background: #f1f8e9;
+            padding: 16px 24px;
+            border-radius: 0 16px 16px 0;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        #demoBtn { display: none; }
+
+        @media (max-width: 768px) {
+            .layout { flex-direction: column; }
+            nav { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid #ddd; }
+            main { padding: 40px 20px; }
+            header h1 { font-size: 2.5rem; }
+        }
+        .title{
+  font-size:4rem;
+  color:#0b57d0;
+  font-family:'Google Sans', sans-serif;
+}
+
+.light{
+ font-family: "Poiret One" , sans-serif;
+  font-size: 4rem;
+  font-style: normal;
+}
+    </style>
+<style>
+/* Android/Material Design 風スタイル */
+.android-promo-card {
+    max-width: 380px;
+    margin: 20px 0;
+    padding: 24px;
+    border-radius: 28px; /* Material 3風の大きな角丸 */
+    background-color: #f8fafd; /* 非常に薄いブルーグレー */
+    border: 1px solid #e1e3e1;
+    font-family: 'Roboto', sans-serif, "Noto Sans JP";
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.android-promo-sub {
+    margin: 0 0 4px 0;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    color: #3DDC84; /* Android Green */
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.android-promo-text {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    color: #1f1f1f;
+    font-weight: 500;
+}
+
+.android-promo-button {
+    display: inline-block;
+    text-decoration: none;
+    background-color: #3DDC84; /* Android Green */
+    color: #073042; /* 暗めのネイビー（Androidアクセントカラー） */
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.android-promo-button:hover {
+    background-color: #32be72;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+</style>
+</head>
+<body lang="ja">
+
+<div class="lang-switch-container">
+    <select class="lang-select" onchange="setLang(this.value)" id="langSelect">
+        <option value="ja">JP🇯🇵</option>
+        <option value="en">US🇺🇸</option>
+    </select>
+</div>
+
+<div class="layout">
+    <nav>
+        <h3 class="ja-only">ドキュメント</h3>
+        <h3 class="en-only">DOCUMENTATION</h3>
+        <a href="#intro" class="ja-only">概要</a>
+        <a href="#intro" class="en-only">Introduction</a>
+        <a href="#install" class="ja-only">インストール</a>
+        <a href="#install" class="en-only">Installation</a>
+        <a href="#basic" class="ja-only">基本的な使い方</a>
+        <a href="#basic" class="en-only">Basic Usage</a>
+        <a href="#advanced" class="ja-only">高度な制御</a>
+        <a href="#advanced" class="en-only">Advanced Info</a>
+        <a href="#specs" class="ja-only">技術仕様</a>
+        <a href="#specs" class="en-only">Technical Specs</a>
+        <div style="margin-top: 40px;">
+            <button class="btn" style="width: 100%;" onclick="runDemo()">Live Demo</button>
+        </div>
+    </nav>
+
+    <main>
+        <section id="intro">
+            <span class="badge">v1.1.0 Released</span>
+            <header>
+                
+               <table>
+                   <tr><td>
+                <h1 class="title">
+  M3Dialog.js 
+                   <span class="light">light</span>
+                       </h1> </td>
+                       <td>
+               <div id="m3-android-promo-card">
+    <div id="m3-android-promo-content">
+        <p id="m3-android-promo-sub">Advanced Features</p>
+        <p class="ja-only"　id="m3-android-promo-text">高度な機能を使用したい場合は？</p>
+                <p class="en-only"　id="m3-android-promo-text">What if I want to use advanced features?</p>
+        <a class="ja-only"　href="https://hc0t48ah6n.github.io/modal/#intro" target="_blank" rel="noopener" id="m3-android-promo-button">
+            M3dialog.jsをご利用ください
+        </a>
+        <a class="en-only"　href="https://hc0t48ah6n.github.io/modal/#intro" target="_blank" rel="noopener" id="m3-android-promo-button">
+            Please use M3dialog.js
+        </a>
+    </div>
+</div>
+
+<style>
+/* Android/Material Design 風スタイル (ID指定版) */
+#m3-android-promo-card {
+    max-width: 380px;
+    margin: 20px 0;
+    padding: 24px;
+    border-radius: 28px;
+    background-color: #f8fafd;
+    border: 1px solid #e1e3e1;
+    font-family: 'Roboto', sans-serif, "Noto Sans JP";
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+#m3-android-promo-sub {
+    margin: 0 0 4px 0;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    color: #3DDC84; /* Android Green */
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#m3-android-promo-text {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    color: #1f1f1f;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+#m3-android-promo-button {
+    display: inline-block;
+    text-decoration: none;
+    background-color: #3DDC84; /* Android Green */
+    color: #073042;
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+#m3-android-promo-button:hover {
+    background-color: #32be72;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+</style>
+                     </td>  </tr>
+</table>
+                <p class="ja-only">M3Dialog-light.js は、Material 3 デザインに基づいたモダンなモーダルダイアログを簡単に表示できる、超軽量なJavaScriptライブラリです。
+依存関係は一切なく、1つのJavaScriptファイルを読み込むだけで使用できます。
+
+PromiseベースのAPIにより、<code>async/await</code> を使ったシンプルで読みやすいコードを書くことができます。</p>
+                <p class="en-only">M3Dialog-light.js is an ultra-lightweight JavaScript library for displaying modern Material 3 style modal dialogs.
+
+It has zero dependencies and works by simply including a single JavaScript file.
+The Promise-based API allows developers to write clean and readable code using <code>async/await</code>.</p>
+                
+            </header>
+        </section>
+
+        <section id="install">
+            <h2 class="ja-only">インストール</h2>
+            <h2 class="en-only">Installation</h2>
+            <div class="card">
+                <p class="ja-only">M3Dialog-light.js はビルドやパッケージ管理ツールを必要としません。
+HTMLに 1行の <code>script</code>タグを追加するだけで利用できます。読み込み後、グローバルオブジェクト M3Dialog が利用可能になります。</p>
+                 <p class="en-only">
+                     M3Dialog-light.js does not require any build tools or dependencies.
+Simply include the script in your HTML file.After loading the script, the global M3Dialog object becomes available.</p>
+                <pre>&lt;script 
+  src="https://hc0t48ah6n.github.io/modal/modal.js" 
+  crossorigin="anonymous"&gt;&lt;/script&gt;
+                &lt;script 
+  src="https://hc0t48ah6n.github.io/m3dialog-light/m3dialog-light.js" 
+  crossorigin="anonymous"&gt;&lt;/script&gt;</pre>
+                <div class="tip">
+
+                  
+
+        <section id="basic">
+            <h2 class="ja-only">基本的な使い方</h2>
+            <h2 class="en-only">Basic Usage</h2>
+            <div class="card">
+                <p class="ja-only">M3Dialog-light.js は Promise ベースの API を提供します。
+async / await を使用することで、ユーザーの選択結果を簡単に取得できます。</p><p class="en-only">M3Dialog-light.js provides a Promise-based API.
+Using async / await, you can easily handle user interactions.</p>
+                <pre>
+modal("削除しますか？").then(r=>{
+  if (r) {
+    alert('YES');
+  } else {
+    alert('NO');
+  }
+})                    
+</pre>
+                
+                
+
+
+
+        <section id="advanced">
+            <h2 class="ja-only">高度な制御</h2>
+            <h2 class="en-only">Advanced Info</h2>
+            <div class="card">
+                <h3 class="ja-only">アニメーションとUX</h3>
+                <h3 class="en-only">Animations & UX</h3>
+                <p class="ja-only">このjavascriptはM3dialog.jsと同じ動作をします。M3Dialog.jsは、クリック地点や要素の中心から広がる拡大アニメーションを採用し、Material 3の「流動的な動き」を再現しています。</p>
+                <p class="en-only">The library features a signature scale-up animation that follows Material 3 motion guidelines, providing a fluid and modern user experience.</p>
+                
+                <h3 class="ja-only">カプセル化されたスタイル</h3>
+                <h3 class="en-only">Self-contained Styles</h3>
+                <p class="ja-only">スタイルシートはJavaScriptの初期化時に自動的に <code>&lt;head&gt;</code> へ注入されるため、外部のCSSファイルを読み込む必要はありません。</p>
+                <p class="en-only">CSS styles are injected into the DOM dynamically upon execution. No external .css link tags are required in your project.</p>
+            </div>
+        </section>
+
+        <section id="specs">
+            <h2 class="ja-only">技術仕様</h2>
+            <h2 class="en-only">Technical Specs</h2>
+            <div class="card">
+                <ul>
+                    <li class="ja-only"><strong>軽量設計:</strong> 依存関係なし、純粋なJavaScriptのみ</li>
+                    <li class="en-only"><strong>Vanilla JS:</strong> Pure JS, zero dependencies.</li>
+                    <li class="ja-only"><strong>互換性:</strong> すべてのモダンブラウザに対応</li>
+                    <li class="en-only"><strong>Compatibility:</strong> Compatible with all modern evergreen browsers.</li>
+                        <li class="ja-only"><strong>言語：</strong> このjavascriptで呼び出されるモーダルの言語は日本語で固定です。その他の言語を使用したい場合はより高度な機能を利用できる<a href="https://hc0t48ah6n.github.io/modal/#intro">M3dialg.js</a>をご利用ください</li>
+                    <li class="en-only">
+                        Language: The language of the modal called by<br> this javascript is <code>FIXED TO JAPANESE</code>. If you want to use other languages, please use <a href="https://hc0t48ah6n.github.io/modal/#intro">M3dialg.js</a>, which has more advanced functions.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+ 
+    </main>
+</div>
+
+<!-- Dummy button for external JS compatibility -->
+<button id="demoBtn"></button>
+       <footer style="margin-top: 100px; padding: 40px 0; border-top: 1px solid #ddd; font-size: 14px; color: var(--outline); text-align: center;">
+            <p class="ja-only">オープンソースライブラリ。世界中の開発者のために構築されました。</p>
+            <p class="en-only">Open-source library. Built for the global developer community.</p>
+            <p style="margin-top: 10px; font-weight: 500;">&copy; 2026 hc0t48ah6n</p>
+         <img href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmrGmeBv3SOLSKz6OlTVlVYkfH9_W3BBgdrA&s"
+             >
+           <a href="https://github.com/hc0t48ah6n">github</a>
+        </footer>
+<script>
+    function setLang(lang) {
+        document.body.setAttribute('lang', lang);
+        const select = document.getElementById('langSelect');
+        if (select) select.value = lang;
+        localStorage.setItem('preferred-lang', lang);
+    }
+
+    window.onload = () => {
+        const savedLang = localStorage.getItem('preferred-lang') || 'ja';
+        setLang(savedLang);
+    };
+
+    async function runDemo() {
+        const lang = document.body.getAttribute('lang');
+        const config = lang === 'ja' ? {
+            title: "デベロッパーツール有効",
+            message: "M3Dialog.js は非同期処理を簡単に扱えるツールです。アニメーションを確認してください。",
+            yesText: "了解",
+            noText: "閉じる"
+        } : {
+            title: "Demo Activated",
+            message: "M3Dialog.js provides a seamless way to handle async interactions. Experience the motion!",
+            yesText: "Got it",
+            noText: "Dismiss"
+        };
+
+        if (typeof M3Dialog !== 'undefined') {
+            await M3Dialog.show(config);
+        } else {
+            alert("M3Dialog object not found.");
+        }
+    }
+
+
+            /**
+         * M3Dialog API
+         * スタイル注入からDOM生成まで全てJSで完結
+         */
+        const M3Dialog = {
+            _styleInjected: false,
+
+            /**
+             * 必要なスタイルをdocumentに注入
+             */
+            _injectStyles: function() {
+                if (this._styleInjected) return;
+
+                const style = document.createElement('style');
+                style.textContent = `
+                    .m3-dialog {
+                        border: none;
+                        border-radius: 28px;
+                        padding: 24px;
+                        width: 90%;
+                        max-width: 400px;
+                        background-color: #e9eef6;
+                        color: #1f1f1f;
+                        box-shadow: 0 12px 20px 0 rgba(0,0,0,0.2);
+                        
+                        /* アニメーションの初期状態: 透明かつやや縮小 */
+                        opacity: 0;
+                        transform: scale(0.92);
+                        
+                        /* transitionの調整: 
+                           cubic-bezier(0, 0, 0.2, 1) は Deceleration curve と呼ばれ、
+                           素早く現れて最後に滑らかに減速して止まる挙動になります。
+                        */
+                        transition: 
+                            opacity 0.2s ease-out, 
+                            transform 0.25s cubic-bezier(0, 0, 0.2, 1);
+                        
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    
+                    /* ダイアログが開いた時の状態: 等倍で静止 */
+                    .m3-dialog[open] {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                    
+                    .m3-dialog::backdrop {
+                        background: rgba(0, 0, 0, 0.4);
+                        backdrop-filter: blur(2px);
+                        opacity: 0;
+                        transition: opacity 0.2s ease;
+                    }
+                    
+                    .m3-dialog[open]::backdrop {
+                        opacity: 1;
+                    }
+
+                    .m3-dialog-title {
+                        font-size: 24px;
+                        font-weight: 400;
+                        margin: 0 0 16px 0;
+                        font-family: 'Roboto', sans-serif;
+                    }
+                    .m3-dialog-content {
+                        font-size: 14px;
+                        line-height: 20px;
+                        color: #444746;
+                        margin-bottom: 24px;
+                        font-family: 'Roboto', sans-serif;
+                    }
+                    .m3-dialog-actions {
+                        display: flex;
+                        justify-content: flex-end;
+                        gap: 8px;
+                    }
+                    .m3-btn-text {
+                        background: transparent;
+                        border: none;
+                        color: #0b57d0;
+                        padding: 10px 16px;
+                        border-radius: 100px;
+                        font-size: 14px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        font-family: 'Roboto', sans-serif;
+                        transition: background 0.2s;
+                    }
+                    .m3-btn-text:hover {
+                        background: rgba(11, 87, 208, 0.08);
+                    }
+                `;
+                document.head.appendChild(style);
+                this._styleInjected = true;
+            },
+
+            /**
+             * ダイアログを表示
+             */
+            show: function(config) {
+                this._injectStyles();
+
+                return new Promise((resolve) => {
+                    const dialog = document.createElement('dialog');
+                    dialog.className = 'm3-dialog';
+
+                    const title = document.createElement('h2');
+                    title.className = 'm3-dialog-title';
+                    title.textContent = config.title || "確認";
+
+                    const content = document.createElement('div');
+                    content.className = 'm3-dialog-content';
+                    content.textContent = config.message || "";
+
+                    const actions = document.createElement('div');
+                    actions.className = 'm3-dialog-actions';
+
+                    const noBtn = document.createElement('button');
+                    noBtn.className = 'm3-btn-text';
+                    noBtn.textContent = config.noText || "キャンセル";
+
+                    const yesBtn = document.createElement('button');
+                    yesBtn.className = 'm3-btn-text';
+                    yesBtn.textContent = config.yesText || "はい";
+
+                    actions.appendChild(noBtn);
+                    actions.appendChild(yesBtn);
+                    dialog.appendChild(title);
+                    dialog.appendChild(content);
+                    dialog.appendChild(actions);
+                    document.body.appendChild(dialog);
+
+                    // 表示 (ブラウザのレンダリングを待つためリクエスト)
+                    requestAnimationFrame(() => {
+                        dialog.showModal();
+                    });
+
+                    const close = (result) => {
+                        // 閉じる時も滑らかにフェードアウト
+                        dialog.style.opacity = '0';
+                        dialog.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            dialog.close();
+                            dialog.remove();
+                            resolve(result);
+                        }, 200);
+                    };
+
+                    yesBtn.onclick = () => close(true);
+                    noBtn.onclick = () => close(false);
+                });
+            }
+        };
+
+        // デモ実行
+        document.getElementById('demoBtn').onclick = async () => {
+            const result = await M3Dialog.show({
+                title: "イージングの修正",
+                message: "バウンス（跳ね返り）をなくし、目標のサイズへ滑らかに拡大して止まるように設定しました。",
+                yesText: "OK",
+                noText: "キャンセル"
+            });
+            console.log("選択結果:", result);
+        };
+</script>
+
+</body>
+</html>
